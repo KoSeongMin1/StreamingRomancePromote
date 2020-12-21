@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            html{
+                overflow-y: scroll;
+                margin: 0px;
+                padding: 0px;
+            }
+            .wrap{
+                min-width: 720px;
+                max-width: 1920px;
+                margin: 0 auto;
+            }
+            .clearfix::after{
+                content: "";
+                clear: both;
+                display: table;
+            }
+            header{
+                background-color: #FFD9FA;
+                position: relative;
+                z-index: 1;
+            }
+            header h1{
+                float: left;
+                height: 60px;
+                margin: 2.5px 50px
+            }
+            header h1>img{
+                height: 100%;
+            }
+            header nav{
+                float: right;
+            }
+            header nav>ul{
+                padding: 0px;
+                margin: 0px;
+            }
+            header nav>ul>li{
+                float: left;
+                list-style: none;
+                padding: 20px 0px;
+                height: 25px;
+                width: 160px;
+                text-align: center;
+            }
+            header nav>ul>li:hover{
+                background-color: black;
+                color: white;
+            }
+            header nav>ul>li:hover .sub_nav{
+                background-color: white;
+                display: block;
+            }
+            .sub_nav{
+                padding: 10px;
+                margin: 20px 0px 0px 0px; /*상 우 하 좌*/
+                width: 140px;
+                display: none;
+            }
+            .sub_nav li{
+                list-style: none;
+                color: black;
+            }
+            #main_visual{
+                position: relative;
+                overflow: hidden;
+            }
+            #visual_container{
+                position: absolute;
+                width: 400%;
+                transition: left 1s;
+            }
+            .LeeText{
+                color: #8f5153;
+            }
+            .YuText{
+                color: #1a1b2e;
+            }
+            .left_0{
+                left: 0%;
+            }
+            .left_1{
+                left: -100%;
+            }
+            .left_2{
+                left: -200%;
+            }
+            .visual_content{
+                float: left;
+                width: 25%;
+            }
+            .visual_content img{
+                width: 100%;
+            }
+            .button{
+                cursor: pointer;
+            }
+            .black_back{
+                background-color: #99004C;
+                color: white;
+                text-align: center;
+                padding: 10px;
+            }
+            .black_back{
+                padding: 10px;
+            }
+            .parallax_block{
+                transition: opacity 1s, margin 1s;
+                opacity: 0;
+                margin-top: 100px;
+            }
+            .active{
+                opacity: 1;
+                margin-top: 0px;
+            }
+            .parallax_block div{
+                float: left;
+            }
+            .parallax_block:nth-child(2) div{
+                float: right;
+            }
+            .block_left{
+                width: calc(40% - 40px);
+                padding: 20px;
+            }
+            .block_left img{
+                width: 100%;
+            }
+            .block_right{
+                width: calc(60% - 40px);
+                padding: 20px;
+            }
+            .block_right p{
+                margin: 0px;
+            }
+            .dimmed{
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.3);
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                z-index: 10;
+                display: none;
+            }
+            .dimmed img{
+                display: block;
+                width: 90%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            .dimmed_active{
+                display: block;
+            }
+            footer{
+                height: 200px;
+                background-color: #F361A6;
+                padding: 20px;
+            }
+        </style>
+        <script>
+            var main_visual;
+            var visual_container;
+            window.onload = function(){
+                console.log("load complete"); /*로드완료라고 알림*/
+                main_visual = document.getElementById("main_visual"); /*main_visual 찾기*/
+                visual_container = document.getElementById("visual_container"); /*visual container 찾기*/
+                console.log(main_visual);
+                console.log(visual_container);
+                console.log(visual_container.style.height);
+                console.log(visual_container.offsetHeight);
+                main_visual.style.height = visual_container.offsetHeight+"px";
+                window.onresize = function(){
+                    main_visual.style.height = visual_container.offsetHeight+"px";
+                    /* visual_container크기를 main_visual에 반영*/
+                }
+            }
+            var current_page = 0;
+            function setPage(index){
+                console.log("setPage:"+index);
+                console.log(visual_container);
+                visual_container.classList.remove("left_0");
+                visual_container.classList.remove("left_1");
+                visual_container.classList.remove("left_2");
+                visual_container.classList.add("left_"+index);
+            }
+            function goLeft(){
+                current_page -= 1;
+                if(current_page < 0)current_page = 0;
+                setPage(current_page);
+            }
+            function goRight(){
+                current_page += 1;
+                if(current_page > 2)current_page = 2;
+                setPage(current_page);
+            }
+
+            function change_scroll(){
+                console.log(document.documentElement.scrollTop);
+                var scroll_center = document.documentElement.scrollTop + window.innerHeight/2;
+                var blocks = document.getElementsByClassName("parallax_block");
+                for(var i=0; i<blocks.length; i++){
+                    if(blocks[i].offsetTop < scroll_center){
+                        //위로 벗어남
+                        blocks[i].classList.add("active");
+                    }else{
+                        //아래로 벗어남
+                        blocks[i].classList.remove("active");
+                    }
+                }
+                if(document.documentElement.scrollTop >= document.documentElement.scrollHeight - document.documentElement.clientHeight){
+                    for(var j=0; j<blocks.length; j++){
+                        blocks[j].classList.add("active");
+                    }
+                }
+            }
+
+            function dimmedOff(index){
+                var dimmedDIV = document.getElementsByClassName("dimmed");
+                dimmedDIV[index].classList.remove("dimmed_active");
+            }
+            function dimmedOn(index){
+                var dimmedDIV = document.getElementsByClassName("dimmed");
+                dimmedDIV[index].classList.add("dimmed_active");
+            }
+        </script>
+        <title>기말과제</title>
+    </head>
+    <body onscroll="change_scroll()">
+        <div class="wrap">
+            <header class="clearfix">
+                <h1><img src="last_img/LOGO.png" alt="no"></h1>
+                <nav>
+                    <ul class="clearfix">
+                        <li>캐릭터
+                            <ul class="sub_nav">
+                                <li>이준탁</li>
+                                <li>유하영</li>
+                                <li>기타 주연</li>
+                            </ul>
+                        </li>
+                        <li>줄거리
+                            <ul class="sub_nav">
+                                <li>시놉시스</li>
+                            </ul>
+                        </li>
+                        <li>외부링크
+                            <ul class="sub_nav">
+                                <li>연재처</li>
+                                <li>티리블로그</li>
+                                <li>티리유튜브</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+            <div id="main_visual">
+                <div id="visual_container" class="clearfix left_0">
+                    <div class="visual_content"><img src="last_img/main_visual_01.jpg" alt="main_visual_01" /></div>
+                    <div class="visual_content"><img src="last_img/main_visual_02.jpg" alt="main_visual_02" /></div>
+                    <div class="visual_content"><img src="last_img/main_visual_03.jpg" alt="main_visual_03" /></div>
+                </div>
+            </div>
+            <div class="black_back">
+                <span class="button" onclick="goLeft();">←</span>
+                <span class="button" onclick="setPage(0);">page1</span>
+                <span class="button" onclick="setPage(1);">page2</span>
+                <span class="button" onclick="setPage(2);">page3</span>
+                <span class="button" onclick="goRight ();">→</span>
+            </div>
+            <div id="parallax_section">
+                <div class="parallax_block clearfix">
+                    <div class="block_left">
+                        <img src="last_img/parallax_visual_01.jpg" alt="parallax_visual_01" onclick="dimmedOn(0)" />
+                    </div>
+                    <div class="block_right">
+                        <p>
+                            <h2>이준탁</h2>
+                            <h3>"내 이름은 이준탁. 난 소심한 성격 탓에 다른 아이들과 잘 어울리지 못하는, 흔히들 말하는 '아싸'다."</h3>
+                            <span class="LeeText">“어... 좋아. 마지막으로 한 번만 얘기할게... 내 이름은 이준탁... 내 입으로 직접 말하긴 조금 그렇지만, 우리 반에선 친구도 없고, 존재감도 없고, 심지어 희망조차 먼지 만큼도 없는... 말하자면 아웃사이더인 아이지... 언제나 일진인 강준영이랑.. 여동현에게 괴롭힘을 받는 신세고... 유일한 낙이라고는 노트북으로 올투게더TV에서 인터넷 방송을 보는 거였지... 특히 “시에리”라는 분의 방송을 제일 좋아했어... 이런 내 인생에도 행복할 날이 올 수 있을까... 난 전혀 상상도 못 했지... “그 애”가 나타나기 전까진 말이야...”</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="parallax_block clearfix">
+                    <div class="block_left">
+                        <img src="last_img/parallax_visual_02.jpg" alt="parallax_visual_02" onclick="dimmedOn(1)" />
+                    </div>
+                    <div class="block_right">
+                        <p>
+                            <h2>유하영</h2>
+                            <h3>"아~ 님들 시하! 반갑습니다, 시에리에요!"</h3>
+                            <span class="YuText">“좋아, 마지막으로 한 번만 얘기할게. 내 이름은 유하영. 내 입으로 직접 말하긴 조금 그렇지만, 우리 학교 최고 미녀이자 항상 전교 1등을 놓친 적이 없는 최고 우등생, 항상 모두에게 사랑과 존경을 받는 최고의 모범생이지. 하지만 나에게는 한가지 비밀이 있어. 사실 나는 올투게더TV에서 “시에리”라는 닉네임으로 인터넷 방송을 하고 있어. 주력 컨텐츠는 라디오 방송, 욕설과 수위 높은 드립이 난무하는 매운 방송을 하고 있지. 그렇지만 반 아이들은 아무도 내가 그런 방송을 하고 있는지 몰랐지. “그 애”가 나타나기 전까진 말이야...”</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="parallax_block clearfix">
+                    <div class="block_left">
+                        <img src="last_img/parallax_visual_03.jpg" alt="parallax_visual_03" onclick="dimmedOn(2)" />
+                    </div>
+                    <div class="block_right">
+                        <p>
+                            <h3>"너 혹시... 올투게더TV 스트리머 "시에리"맞아?"</h3>
+                            <span class="YuText">“설마 내 방송을 보는 시청자가 우리 반에 있을 줄은 몰랐지.”</span><br />
+                            <span class="LeeText">“설마 좋아하던 여자애가 내가 가장 좋아하는 스트리머일 줄은 몰랐지.”</span><br />
+                            <span class="YuText">“으아아! 설마 내가 방송하는 게 우리 반 얘한테 들킬 줄이야!!”</span><br />
+                            <span class="LeeText">“그래서 자기가 방송하는 걸 절대 말하지 말라고 부탁하더라. 하지만...”</span><br />
+                            <span class="YuText">“비밀을 지켜주는 대가로 나랑 1일 해달라고? 너 미쳤니 진짜?!”</span><br />
+                            <span class="LeeText">“가장 좋아하는 스트리머랑 연애하게 된 나에게는, 이제 어떤 일이 일어날까?”</span><br />
+                            <span class="YuText">“이건 들켜서는 안 될 비밀을 들킨,”</span><br />
+                            <span class="LeeText">“하지만 그런 비밀까지 좋아해 줄 수 있는,”</span><br />
+                            <span class="YuText">“우리들의 </span><span class="LeeText">이야기.”</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="dimmed" onclick="dimmedOff(0)">
+                <img src="last_img/parallax_visual_01.jpg" alt="parallax_visual_01">
+            </div>
+            <div class="dimmed" onclick="dimmedOff(1)">
+                <img src="last_img/parallax_visual_02.jpg" alt="parallax_visual_02">
+            </div>
+            <div class="dimmed" onclick="dimmedOff(2)">
+                <img src="last_img/parallax_visual_03.jpg" alt="parallax_visual_03">
+            </div>
+            <footer>
+                본작 "내 연애는 생방송 중!"의 기획 내용 및 시나리오의 저작권은 작가 티리에게 있으며, <br />
+                이는 한국저작권위원회 등록번호 C-2020-030412(내 연애는 생방송 중!)로 등록되어 있습니다. <br />
+                ⓒ Copyright by Tiry, All Right Reserved. <br />
+                On November 21, 1972, Kim Doo-han collapsed from high blood pressure, a long illness. <br />
+                <br />
+                <a href="https://comic.naver.com/challenge/list.nhn?titleId=744741">"내 연애는 생방송 중!" 연재처 바로 가기</a>
+            </footer>
+        </div>
+    </body>
+</html>
